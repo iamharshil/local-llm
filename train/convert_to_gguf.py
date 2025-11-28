@@ -1,8 +1,13 @@
 import os
 
-# Clone llama.cpp (converter)
+# Clone llama.cpp if missing
 if not os.path.exists("llama.cpp"):
     os.system("git clone https://github.com/ggerganov/llama.cpp.git")
 
-# Convert HF → GGUF
-os.system("python3 llama.cpp/convert-hf-to-gguf.py models/lora-output --outfile models/mistral.gguf")
+# Make sure converter is executable
+os.system("chmod +x llama.cpp/convert-hf-to-gguf")
+
+# Convert HuggingFace model → GGUF
+cmd = "python3 llama.cpp/convert-hf-to-gguf --outfile models/mistral.gguf models/lora-output"
+print("Running:", cmd)
+os.system(cmd)

@@ -17,7 +17,8 @@ RUN pip install --no-cache-dir \
     fastapi \
     uvicorn \
     huggingface_hub \
-    llama-cpp-python
+    llama-cpp-python \
+    torch
 
 WORKDIR /app
 COPY . .
