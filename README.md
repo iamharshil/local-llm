@@ -49,7 +49,7 @@ By default the API listens on `http://localhost:8000` (confirm in `docker-compos
 Simple `curl` request (JSON):
 
 ```bash
-curl -sS -X POST "http://localhost:8000/" \
+curl -sS -X POST "http://localhost:8000/ask" \
   -H "Content-Type: application/json" \
   -d '{"q": "How many shirts from 30 meters?"}'
 ```
@@ -59,7 +59,7 @@ Example Python client using `requests`:
 ```python
 import requests
 
-resp = requests.post('http://localhost:8000/', json={'q': 'How many shirts from 30 meters?'})
+resp = requests.post('http://localhost:8000/ask', json={'q': 'How many shirts from 30 meters?'})
 print(resp.json())
 ```
 
@@ -92,6 +92,22 @@ docker compose logs -f llm-train
 If you want, I can also:
 - Add a short example `curl` test into a `tests/` script.
 - Update `docker-compose.yml` with explicit environment variables and comments.
+
+
+**Troubleshooting**
+- If Docker Compose errors, ensure you are using a compatible Docker Engine and the Compose plugin: `docker compose version`.
+- If the model file is missing, confirm the training step completed and outputs were saved to `models/`.
+
+- Check running containers:
+```bash
+docker compose ps
+```
+ 
+- Logs:
+```bash
+  docker compose logs -f llm-api
+  docker compose logs -f llm-train
+```
 
 ---
 Updated: concise setup, commands, API examples, and troubleshooting.
