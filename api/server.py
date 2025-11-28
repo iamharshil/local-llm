@@ -4,12 +4,11 @@ import os
 
 app = FastAPI()
 
-model_path = os.getenv("MODEL_PATH", "models/mistral.gguf")
+model_path = os.getenv("MODEL_PATH", "models/phi3-mini.gguf")
 
 llm = Llama(model_path=model_path, n_ctx=4096)
 
-
 @app.post("/ask")
 async def ask(q: str):
-    out = llm(q)
-    return {"success": True, "response": out["choices"][0]['text']}
+    resp = llm(q)
+    return {"answer": resp["choices"][0]["text"]}

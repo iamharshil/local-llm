@@ -1,8 +1,11 @@
 import torch
 from datasets import load_dataset
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer
+from transformers import (
+    AutoTokenizer, AutoModelForCausalLM,
+    TrainingArguments, Trainer,
+    DataCollatorForLanguageModeling
+)
 from peft import LoraConfig, get_peft_model, TaskType
-from transformers import DataCollatorForLanguageModeling
 
 import os
 os.environ["SAFETENSORS_FAST_GPU"] = "0"   # disable accelerated mmap
@@ -17,8 +20,10 @@ model_name = "microsoft/Phi-3-mini-4k-instruct"
 dataset = load_dataset("json", data_files="data/dataset.jsonl")
 
 # Tokenizer setup
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.eos_token
+
 
 # Tokenization function
 def tokenize(batch):
@@ -65,24 +70,23 @@ model = get_peft_model(model, lora_cfg)
 args = TrainingArguments(
     output_dir="models/lora-output",
     per_device_train_batch_size=1,
+    gradient_accumulation_steps=1,
     num_train_epochs=1,
-    save_strategy="epoch",
     learning_rate=2e-4,
+    save_strategy="epoch",
+    logging_steps=10
 )
 
-collator = DataCollatorForLanguageModeling(
-    tokenize,
-    mlm=False,
-)
+collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
+
 
 trainer = Trainer(
     model=model,
     args=args,
-    train_dataset=tokenized['train'],
-    data_collator=collator,
+    train_dataset=tokenized["train"],
+    data_collator=collator
 )
-
 
 trainer.train()
 trainer.save_model("models/lora-output")
-trainer.save_pretrained("models/lora-output")
+tokenizer.save_pretrained("models/lora-output")
