@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  llm-api:
+    build: .
+    container_name: local-llm-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    environment:
+      - MODEL_PATH=/app/models/mistral.gguf
+
+  llm-train:
+    build: .
+    container_name: local-llm-train
+    command: ["python", "train/train.py"]
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
